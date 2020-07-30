@@ -149,21 +149,21 @@ paths:
     get:
       description: Executes a query on the datasource
       parameters:
-      - name: sql
-        in: query
-        type: string
-        description: The MetaModel-flavoured SQL query to execute
-        required: true
-      - name: offset
-        in: query
-        type: string
-        description: An offset / first-row flag to set on the query
-        required: false
-      - name: limit
-        in: query
-        type: string
-        description: A limit / max-rows flag to set on the query
-        required: false
+        - name: sql
+          in: query
+          type: string
+          description: The MetaModel-flavoured SQL query to execute
+          required: true
+        - name: offset
+          in: query
+          type: string
+          description: An offset / first-row flag to set on the query
+          required: false
+        - name: limit
+          in: query
+          type: string
+          description: A limit / max-rows flag to set on the query
+          required: false
       responses:
         200:
           description: Query executed
@@ -208,6 +208,36 @@ paths:
           description: Schema not found
           schema:
             $ref: "#/definitions/error"
+  /{tenant}/{datasource}/s/{schema}/all:
+    parameters:
+      - name: tenant
+        in: path
+        type: string
+        description: The tenant name
+        required: true
+      - name: datasource
+        in: path
+        type: string
+        description: The datasource name
+        required: true
+      - name: schema
+        in: path
+        type: string
+        description: The schema name
+        required: true
+    get:
+      responses:
+        200:
+          description: Schema found
+          schema:
+            $ref: "#/definitions/getSchemaAllResponse"
+        404:
+          description: Schema not found
+          schema:
+            $ref: "#/definitions/error"
+
+
+
   /{tenant}/{datasource}/s/{schema}/t/{table}:
     parameters:
       - name: tenant
@@ -463,12 +493,12 @@ definitions:
           description: A record to insert where each key is expected to match a column name and each value is the value to put.
           type: object
         example:
-        - fullname: Jane Doe
-          email_address: janedoe@gmail.com
-          favourite_java_library: null
-        - fullname: John Doe
-          email_address: johndoe@gmail.com
-          favourite_java_library: "MetaModel"
+          - fullname: Jane Doe
+            email_address: janedoe@gmail.com
+            favourite_java_library: null
+          - fullname: John Doe
+            email_address: johndoe@gmail.com
+            favourite_java_library: "MetaModel"
   whereCondition:
     type: object
     properties:
@@ -485,12 +515,12 @@ definitions:
   operator:
     type: string
     enum:
-    - "eq"
-    - "ne"
-    - "gt"
-    - "lt"
-    - "like"
-    - "not_like"
+      - "eq"
+      - "ne"
+      - "gt"
+      - "lt"
+      - "like"
+      - "not_like"
   postDataResponse:
     description: Represents the result of posting a data update to the records to a table
     type: object
@@ -677,6 +707,73 @@ definitions:
           remarks:
             type: string
             description: Any remarks on the column
+  getSchemaAllResponse:
+  type: object
+  properties:
+    type:
+      type: string
+      description: The type of entity (schema)
+    name:
+      type: string
+      description: The schema name
+    datasource:
+      type: string
+      description: The datasource name
+    tenant:
+      type: string
+      description: The tenant name
+    tables:
+      type: array
+      description: The names of the schema's tables
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+            description: The type of entity (table)
+          name:
+            type: string
+            description: The table name
+          columns:
+            type: array
+            description: The names of the table's columns
+            items:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: The type of entity (column)
+                name:
+                  type: string
+                  description: The column name
+                metadata:
+                  type: object
+                  description: Metadata about the column
+                  properties:
+                    number:
+                      type: integer
+                      description: The column number (0-based)
+                    size:
+                      type: integer
+                      description: The column size
+                    nullable:
+                      type: boolean
+                      description: Is the column nullable?
+                    primary-key:
+                      type: boolean
+                      description: Is the column a primary key?
+                    indexed:
+                      type: boolean
+                      description: Is the column indexed?
+                    column-type:
+                      type: string
+                      description: The column type (as interpreted/adapted by Apache MetaModel)
+                    native-type:
+                      type: string
+                      description: The native column type (as defined by the datasource itself)
+                    remarks:
+                      type: string
+                      description: Any remarks on the column
   error:
     description: Elaborates the error that occurred
     type: object
