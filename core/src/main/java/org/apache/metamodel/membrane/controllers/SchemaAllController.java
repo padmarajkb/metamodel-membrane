@@ -73,7 +73,8 @@ public class SchemaAllController {
         response.setTables(tablesList);
         response.setDatasource(dataSourceName);
         response.setTenant(tenantId);
-
+        response.setType("schema");
+        response.setName(schemaId);
         return response;
 
     }
